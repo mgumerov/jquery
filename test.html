@@ -1,0 +1,45 @@
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <script src="http://requirejs.org/docs/release/2.3.2/comments/require.js"></script>
+</head>
+<body>
+
+<table class="table" id="myTable">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Data</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<script>
+    requirejs.config({
+        shim : {
+            "bootstrap" : { "deps" :['tether', 'jquery'] }
+        },
+        paths: {
+            "jquery" : "https://code.jquery.com/jquery-3.1.1.min",
+            "tether" : "https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min",
+            "bootstrap" :  "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min"
+        }
+    });
+
+    require(["jquery"], function($) {
+        $( document ).ready( () => $.ajax({
+              url: 'arrays.txt',
+              dataType : "json",                     
+              success: function (result, textStatus) { 
+                  result.data.forEach(function(val, i) {   
+                      var tr = $('#myTable tbody').append('<tr/>');
+                      tr.append($("<th scope='row'/>").text(i));
+                      tr.append($('<td/>').text(val[0]));
+                  });
+              } 
+        }));
+    });
+</script>
+
+</body>
