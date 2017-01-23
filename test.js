@@ -1,7 +1,6 @@
 define(["jquery"], function($) {
    var columns = 
     [
-      "ID",
       "Артикул",
       "Поставщик",
       "Бренд",
@@ -32,19 +31,22 @@ define(["jquery"], function($) {
 
     columns.forEach((column,i,columns) => { if (!column.name) columns[i] = { name: column } });
 
-    function reloadTable(url) {
-        if (typeof url != "string") throw "String expected"; //strings are immutable and that's what we actually want here
+    function reloadTable(pageIdx) {
+        if (typeof pageIdx != "number") throw "Number expected"; //primitives are immutable and that's what we actually want here
+
+        var url = 'data.json?page=' + pageIdx;
+
         return $.ajax({
           url: url,
           dataType : "json",
-          success: function (result, textStatus) { 
+          success: function (result, textStatus) {
+              result.page = result.page.slice(pageSize*(pageIdx-1), pageSize*pageIdx); //todo proper server-side pagination support
+
               $('#urldebug').text('URL=' + url);
               $('#myTable tbody').empty();
-              result.forEach(function(row, i) {
-                  if (i>=5) return;               //todo proper pagination
-
+              pageCnt = Math.ceil(result.total / pageSize);
+              result.page.forEach(function(row, i) {
                   var tr = $('<tr/>').appendTo($('#myTable tbody'));
-                  tr.append($("<th scope='row'/>").text(i+1));
                   columns.forEach(column => {
                     var td = $("<td/>").appendTo(tr);
                     var value = row[column.name];
@@ -61,14 +63,14 @@ define(["jquery"], function($) {
 
     function init() {
         var tr = $('#myTable thead tr');
-        tr.append('<th>#</th>');
         columns.forEach(column => tr.append($("<th/>").text(column.name)));
 
-        setPage(2);
+        setPage(1);
     }
 
     function setPage(pageNum) {
-        reloadTable('data.json?page='+pageNum).done(() => { updateNav(pageNum); page = pageNum; });
+        if (typeof pageNum != "number") throw "Number expected"; //immutability check because we use async processing here
+        reloadTable(pageNum).done(() => { updateNav(pageNum); page = pageNum; }).fail((xhr, text) => alert(text));
     }
 
     function updateNav(pageNum) {
@@ -104,6 +106,7 @@ define(["jquery"], function($) {
 
     var page = 1;
     var pageCnt = 10; 
+    var pageSize = 5;
 
     return {
       init: init
