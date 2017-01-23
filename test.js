@@ -116,6 +116,8 @@ define(["jquery"], function($) {
     presenter.init();
     $('.page-item.view-mode').removeClass("active");
     $('.page-item.' + presenter.classname).addClass("active");
+
+    //if we've been showing something, present it another way
     if (page) setPage(page);
   }
 
@@ -155,8 +157,8 @@ define(["jquery"], function($) {
       $('.page-link.page-prev').click(eventObject => setPage(page - 1));
   }
 
-  var page = 1;
-  var pageCnt = 10; 
+  var page;
+  var pageCnt;
   var pageSize = 5;
   var presenter;
 
