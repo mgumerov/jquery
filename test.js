@@ -64,7 +64,7 @@ define(["jquery", "test-data"], function($, startGetData) {
               $('#myTiles').removeClass('hidden');
               $('#myTiles').empty();
               page.forEach(function(row, i) {
-                  var tile = $('<div class = "col-sm-6 col-md-3"/>').appendTo($('#myTiles'));
+                  var tile = $('<div class = "col-sm-3	col-md-2"/>').appendTo($('#myTiles'));
                   $('<div class = "thumbnail">').append($('<img>').attr('src', row["Картинка"])).appendTo(tile);
                   var info = $('<div class = "caption text-center">').appendTo(tile);
                   info.append($('<h3>').text(row["Название"]));
@@ -151,7 +151,7 @@ define(["jquery", "test-data"], function($, startGetData) {
 
   var page;
   var pageCnt;
-  var pageSize = 5;
+  var pageSize = 12;
   var presenter;
 
   return {
