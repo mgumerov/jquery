@@ -1,4 +1,4 @@
-define(["jquery"], function($) {
+define(["jquery", "test-data"], function($, startGetData) {
 
   function tabularPresenter() {
       var columns = 
@@ -34,7 +34,7 @@ define(["jquery"], function($) {
         tr.empty();
         columns.forEach(column => tr.append($("<th/>").text(column.name)));
 
-        setPage(1);
+        startSetPage(1);
       }
 
       function hide() {
@@ -84,29 +84,11 @@ define(["jquery"], function($) {
     };
   }
 
-  function loadPage(pageIdx) {
-      if (typeof pageIdx != "number") throw "Number expected"; //primitives are immutable and that's what we actually want here
-
-      var url = 'data.json?page=' + pageIdx;
-
-      return $.ajax({
-        url: url,
-        dataType : "json",
-        success: function (result, textStatus) {
-            result.page = result.page.slice(pageSize*(pageIdx-1), pageSize*pageIdx); //todo proper server-side pagination support
-
-            $('#urldebug').text('URL=' + url);
-            pageCnt = Math.ceil(result.total / pageSize);
-            presenter.fill(result.page);
-        } 
-      });
-  }
-
   function init() {
       [tabularPresenter(), tilePresenter()].forEach(p =>
           $('.page-item.' + p.classname + ' a').click(eventObject => setPresenter(p)));
       setPresenter(tilePresenter());
-      setPage(1);
+      startSetPage(1);
   }
 
   function setPresenter(_presenter) {
@@ -118,12 +100,22 @@ define(["jquery"], function($) {
     $('.page-item.' + presenter.classname).addClass("active");
 
     //if we've been showing something, present it another way
-    if (page) setPage(page);
+    if (page) startSetPage(page);
   }
 
-  function setPage(pageNum) {
+  function startSetPage(pageNum) {
       if (typeof pageNum != "number") throw "Number expected"; //immutability check because we use async processing here
-      loadPage(pageNum).done(() => { updateNav(pageNum); page = pageNum; }).fail((xhr, text) => alert(text));
+      startGetData(pageNum, pageSize)
+          .then(
+              (result) => {
+                $('#urldebug').text('page=' + pageNum);
+                pageCnt = Math.ceil(result.total / pageSize);
+                presenter.fill(result.page);
+              })
+          .then(
+              function done() { updateNav(pageNum); page = pageNum; },
+              function failed(text) { alert(text); }
+          );
   }
 
   function updateNav(pageNum) {
@@ -152,9 +144,9 @@ define(["jquery"], function($) {
           $('<li class="page-item"/>').append($('<a class="page-link page-direct" href = "#"/>').text(pageCnt)).appendTo(ul);
 
       //Set up handlers here so we can consume module internals instead of global vars/fns
-      $('.page-link.page-direct').click(eventObject => setPage(Number(eventObject.target.text)));
-      $('.page-link.page-next').click(eventObject => setPage(page + 1));
-      $('.page-link.page-prev').click(eventObject => setPage(page - 1));
+      $('.page-link.page-direct').click(eventObject => startSetPage(Number(eventObject.target.text)));
+      $('.page-link.page-next').click(eventObject => startSetPage(page + 1));
+      $('.page-link.page-prev').click(eventObject => startSetPage(page - 1));
   }
 
   var page;
