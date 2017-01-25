@@ -64,7 +64,7 @@ define(["jquery", "test-data"], function($, startGetData) {
               $('#myTiles').removeClass('hidden');
               $('#myTiles').empty();
               page.forEach(function(row, i) {
-                  var tile = $('<div class = "col-sm-3	col-md-2"/>').appendTo($('#myTiles'));
+                  var tile = $('<div class = "col-sm-4 col-md-3 col-lg-2"/>').appendTo($('#myTiles'));
                   $('<div class = "thumbnail">').append($('<img>').attr('src', row["Картинка"])).appendTo(tile);
                   var info = $('<div class = "caption text-center">').appendTo(tile);
                   info.append($('<h3>').text(row["Название"]));
@@ -85,6 +85,14 @@ define(["jquery", "test-data"], function($, startGetData) {
   }
 
   function init() {
+      $('.dropdown-menu a').on( 'click', function( event ) {
+        if (event.currentTarget == event.target) {//direct click on a link text
+          $('.dropdown-menu a input').prop('checked', false);
+          $(event.target).find('input').prop('checked', true);
+        }
+        alert($('.dropdown-menu input:checked').parent().text());
+        return true;
+      });
       [tabularPresenter(), tilePresenter()].forEach(p =>
           $('.page-item.' + p.classname + ' a').click(eventObject => setPresenter(p)));
       setPresenter(tilePresenter());

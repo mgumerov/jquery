@@ -5,6 +5,16 @@
 </head>
 <body>
 
+<div class="dropdown">
+  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">Класс нагрузки<span class="caret"></span></button>
+  <ul class="dropdown-menu">
+    <li><a href="#" class="small" data-value="31" tabIndex="-1"><input type="checkbox"/>&nbsp;31</a></li>
+    <li><a href="#" class="small" data-value="32" tabIndex="-1"><input type="checkbox"/>&nbsp;32</a></li>
+    <li><a href="#" class="small" data-value="33" tabIndex="-1"><input type="checkbox"/>&nbsp;33</a></li>
+    <li><a href="#" class="small" data-value="34" tabIndex="-1"><input type="checkbox"/>&nbsp;34</a></li>
+  </ul>
+</div>
+
 <p class="debug" id="urldebug"></p>
 <div class="table-responsive">
 <table class="table data" id="myTable">
@@ -31,6 +41,8 @@
 </div>
 
 <script>
+
+
     requirejs.config({
         shim : {
             "bootstrap" : { "deps" :['tether', 'jquery'] }
@@ -44,7 +56,7 @@
         }
     });
 
-    require(["main","jquery"], function (main, $) { 
+    require(["main","jquery","bootstrap"], function (main, $, bootstrap) { 
         $( document ).ready( () => {
             main.init();
         });
