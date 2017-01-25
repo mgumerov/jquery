@@ -29,6 +29,13 @@
 
 <div class = "row" id="myTiles">
 </div>
+<script id="sampleTile" type="text/x-handlebars-template">
+              <div class = "col-sm-4 col-md-3 col-lg-2">
+                  <div class = "thumbnail"><img src="{{Картинка}}"/></div>
+                  <div class = "caption text-center"><h3>{{Название}}</h3></div>
+                  <p>Цена: {{Цена}}</p><p>Класс нагрузки: {{"Класс нагрузки"}}</p><p>Фаска: {{Фаска}}</p>
+              </div>
+</script>
 
 <div class="col-md-12 text-center">
 <ul class="pagination pull-left">
@@ -51,6 +58,7 @@
             "jquery" : "https://code.jquery.com/jquery-3.1.1.min",
             "tether" : "https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min",
             "bootstrap" : "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min",
+            "handlebars" : "http://builds.handlebarsjs.com.s3.amazonaws.com/handlebars.min-6300e57",
             "test-data" : "test-data",
             "main" : "test"
         }

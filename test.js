@@ -1,4 +1,4 @@
-define(["jquery", "test-data"], function($, startGetData) {
+define(["jquery", "test-data", "handlebars"], function($, startGetData, handlebars) {
 
   function tabularPresenter() {
       var columns = 
@@ -50,25 +50,14 @@ define(["jquery", "test-data"], function($, startGetData) {
   };
 
   function tilePresenter() {
-    var nameProp = "Название";
-    var imgProp = "Картинка";
-    var details = 
-     [
-       "Цена",
-       "Класс нагрузки",
-       "Фаска"
-     ];
-
-    //не многовато верстки внутри JS? Что делать - определить как-то шаблон в HTML невидимый?
     function fill(page) {
               $('#myTiles').removeClass('hidden');
               $('#myTiles').empty();
               page.forEach(function(row, i) {
-                  var tile = $('<div class = "col-sm-4 col-md-3 col-lg-2"/>').appendTo($('#myTiles'));
-                  $('<div class = "thumbnail">').append($('<img>').attr('src', row["Картинка"])).appendTo(tile);
-                  var info = $('<div class = "caption text-center">').appendTo(tile);
-                  info.append($('<h3>').text(row["Название"]));
-                  details.forEach(prop => info.append($('<p>').text(prop + ':' + row[prop])));
+                    var source = $("#sampleTile").html();
+                    var template = handlebars.compile(source);
+                    var html = template(row);
+                    $('#myTiles').append(html);
               });
     }
 
