@@ -106,44 +106,40 @@ define(["jquery", "test-data", "handlebars"], function($, startGetData, handleba
           .then(
               (result) => {
                 $('#urldebug').text('page=' + pageNum);
-                pageCnt = Math.ceil(result.total / pageSize);
                 presenter.fill(result.page);
+                return Math.ceil(result.total / pageSize);
               })
           .then(
-              function done() { updateNav(pageNum); page = pageNum; },
+              function done(pageCount) {
+                //todo what is pageCnt < pageNum due to filtering or server-side changes?
+                pageCnt = pageCount;
+                page = pageNum;
+                updateNav();
+              },
               function failed(text) { alert(text); }
           );
   }
 
-  function updateNav(pageNum) {
+  function updateNav() {
       var ul = $('.tablepages');
-      ul.empty();
+      ul.toggleClass("hidden", pageCnt == 1);
       if (pageCnt == 1)
          return;
 
-      //1st
-      if (1 != pageNum)
-          $('<li class="page-item"/>').append($('<a class="page-link page-direct" href = "#"/>').text(1)).appendTo(ul);
-
-      //prev
-      if (1 != pageNum - 1 && pageNum != 1)
-          $('<li class="page-item"><a class="page-link page-prev" href = "#">&laquo;</a></li>').appendTo(ul);
-
-      //this
-      $('<li class="page-item active"/>').append($('<a class="page-link page-direct" href = "#"/>').text(pageNum)).appendTo(ul);
-
-      //next
-      if (pageCnt != pageNum + 1 && pageNum != pageCnt)
-          $('<li class="page-item"><a class="page-link page-next" href = "#">&raquo;</a></li>').appendTo(ul);
-
-      //last
-      if (pageCnt != pageNum)
-          $('<li class="page-item"/>').append($('<a class="page-link page-direct" href = "#"/>').text(pageCnt)).appendTo(ul);
+      ul.find('a.page-link[data-source]').each((_i,_a) => { var a = $(_a); a.text(eval(a.attr("data-source"))); });
+      var vis = {
+        home: (1 != page),
+        prev: (1 != page - 1 && page != 1),
+        next: (pageCnt != page + 1 && page != pageCnt),
+        end: (pageCnt != page)
+      };
+      ul.find('a.page-link[data-visible]').each((_i,_a) => { var a = $(_a); a.toggleClass("hidden", !eval(a.attr("data-visible"))); });
 
       //Set up handlers here so we can consume module internals instead of global vars/fns
-      $('.page-link.page-direct').click(eventObject => startSetPage(Number(eventObject.target.text)));
-      $('.page-link.page-next').click(eventObject => startSetPage(page + 1));
-      $('.page-link.page-prev').click(eventObject => startSetPage(page - 1));
+      ul.find('.page-link').off();
+      ul.find('.page-link.page-direct').click(eventObject => startSetPage(Number(eventObject.target.text)));
+      ul.find('.page-link.page-next').click(eventObject => startSetPage(page + 1));
+      ul.find('.page-link.page-prev').click(eventObject => startSetPage(page - 1));
   }
 
   var page;

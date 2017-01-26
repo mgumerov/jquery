@@ -43,7 +43,13 @@
   <li class="page-item view-mode view-tiles"><a class="page-link" href = "#"><span class="glyphicon glyphicon-th"></span></a></li>
 </ul>
 <nav>
-  <ul class="pagination tablepages"/>
+  <ul class="pagination tablepages">
+    <li class="page-item"><a class="page-link page-direct" data-visible="vis.home" href = "#">1</a></li>
+    <li class="page-item"><a class="page-link page-prev" data-visible="vis.prev" href = "#">&laquo;</a></li>
+    <li class="page-item active"><a class="page-link page-direct" data-source="page" href = "#"></a></li>
+    <li class="page-item"><a class="page-link page-next" data-visible="vis.next" href = "#">&raquo;</a></li>
+    <li class="page-item"><a class="page-link page-direct" data-source="pageCnt" data-visible="vis.end" href = "#"/></a></li>
+  </ul>
 </nav>
 </div>
 
