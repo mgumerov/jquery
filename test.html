@@ -5,9 +5,10 @@
 </head>
 <body>
 
-<div class="dropdown">
+<div class="dropdown" data-filter-bind="bindClassFilter" data-filter-load="loadClassFilter" data-filter-clear="clearClassFilter">
   <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">Класс нагрузки<span class="caret"></span></button>
   <ul class="dropdown-menu">
+    <li><a href="#" class="small" tabIndex="-1">Любой</li>
     <li><a href="#" class="small" data-value="31" tabIndex="-1"><input type="checkbox"/>&nbsp;31</a></li>
     <li><a href="#" class="small" data-value="32" tabIndex="-1"><input type="checkbox"/>&nbsp;32</a></li>
     <li><a href="#" class="small" data-value="33" tabIndex="-1"><input type="checkbox"/>&nbsp;33</a></li>

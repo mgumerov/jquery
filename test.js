@@ -74,14 +74,12 @@ define(["jquery", "test-data", "handlebars"], function($, startGetData, handleba
   }
 
   function init() {
-      $('.dropdown-menu a').on( 'click', function( event ) {
-        if (event.currentTarget == event.target) {//direct click on a link text
-          $('.dropdown-menu a input').prop('checked', false);
-          $(event.target).find('input').prop('checked', true);
-        }
-        alert($('.dropdown-menu input:checked').parent().text());
-        return true;
-      });
+      $('[data-filter-bind]').toArray().map(_ => { var s = $(_); eval(s.attr('data-filter-bind'))(s); });
+      filters = {};
+      //По идее в начале на форме и так пустой фильтр, но формально так будет правильнее
+      $('[data-filter-clear]').toArray().map(_ => { var s = $(_); eval(s.attr('data-filter-clear'))(s); });
+      $('[data-filter-load]').toArray().map(_ => { var s = $(_); eval(s.attr('data-filter-load'))(s); });
+
       [tabularPresenter(), tilePresenter()].forEach(p =>
           $('.page-item.' + p.classname + ' a').click(eventObject => setPresenter(p)));
       setPresenter(tilePresenter());
@@ -97,26 +95,48 @@ define(["jquery", "test-data", "handlebars"], function($, startGetData, handleba
     $('.page-item.' + presenter.classname).addClass("active");
 
     //if we've been showing something, present it another way
+    startReloadPage();
+  }
+
+  function startReloadPage() {
     if (page) startSetPage(page);
   }
 
   function startSetPage(pageNum) {
       if (typeof pageNum != "number") throw "Number expected"; //immutability check because we use async processing here
-      startGetData(pageNum, pageSize)
+
+      //По идее на каждое изменение мы фильтры перечитываем, но если вдруг это изменится и вообще на всякий случай - перечитаем
+      $('[data-filter-load]').toArray().map(_ => { var s = $(_); eval(s.attr('data-filter-load'))(s); });
+
+      startGetData(pageNum, pageSize, filters)
           .then(
               (result) => {
-                $('#urldebug').text('page=' + pageNum);
+                var pgcount = Math.ceil(result.total / pageSize);
+
+                //Если такой страницы уже нет, ничего не делаем и вместо этого потребуем переход на ту, которая по нашим данным есть
+                //Может получиться, что фильтр сменился за это время на гуи, и возможно придется еще раз перечитать,
+                //  но это уже забота этого следующего порожденного нами асинка, не наша
+                if (pageNum > pgcount) {
+                  //Заметим, что всякий раз номер страницы уменьшается, т.е. вечный цикл невозможен. Но конечно возможно, в теории,
+                  //адское торможение, если сервер будет постепенно удалять элементы, и успевать каждый раз уменьшить кол-во страниц на 1
+                  //как раз тогда, когда мы решили перейти на страницу назад; todo возможно, следует после 2-3 попыток сбрасывать сразу на первую страницу.
+                  //todo Ручной переход на страницу например "1" должен откючать уже запущенные такие "автоматические" коррекционные повторные переходы, 
+                  //  не то они отменят его действие
+                  startSetPage(pgcount, pageSize, filters);
+                  return $.Deferred().reject(null);
+                }
+
                 presenter.fill(result.page);
-                return Math.ceil(result.total / pageSize);
+                return pgcount;
               })
           .then(
               function done(pageCount) {
-                //todo what is pageCnt < pageNum due to filtering or server-side changes?
+                $('#urldebug').text('page=' + pageNum);
                 pageCnt = pageCount;
                 page = pageNum;
                 updateNav();
               },
-              function failed(text) { alert(text); }
+              function failed(text) { if (text) alert(text); }
           );
   }
 
@@ -142,10 +162,45 @@ define(["jquery", "test-data", "handlebars"], function($, startGetData, handleba
       ul.find('.page-link.page-prev').click(eventObject => startSetPage(page - 1));
   }
 
+  //Class filter
+  function onClassFilterChange( event ) {
+    var filterRoot = $(event.target).parents('[data-filter-load]');
+    var menu = filterRoot.find('.dropdown-menu');
+    if (event.currentTarget == event.target) {//direct click on a link text
+      if (!$(event.target).attr("data-value")) { // = "all"
+        menu.find('a input').prop('checked', true);
+      } else {
+        menu.find('a input').prop('checked', false);
+        $(event.target).find('input').prop('checked', true);
+      }
+    }
+    loadClassFilter(filterRoot);
+    startReloadPage();
+    return true;
+  }
+
+  function loadClassFilter(filterRootSelector) {
+    var menu = filterRootSelector.find('.dropdown-menu');
+    if (menu.find('input:not(:checked)').length == 0) {
+      delete filters.classes;
+    } else {
+      filters.classes = menu.find('input:checked').parent().toArray().map($).map(_ => _.attr("data-value")).map(Number);
+    }
+  }
+
+  function clearClassFilter(filterRootSelector) {
+      filterRootSelector.find('.dropdown-menu a').find('input').prop('checked', true);
+  }
+
+  function bindClassFilter(filterRootSelector) {
+      filterRootSelector.find('.dropdown-menu a').on('click', onClassFilterChange);
+  }
+
   var page;
   var pageCnt;
   var pageSize = 12;
   var presenter;
+  var filters;
 
   return {
     init: init
