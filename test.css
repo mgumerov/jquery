@@ -8,6 +8,18 @@
     width: 150px;
 }
 
+.thumbnail {
+    margin-bottom: 0;
+}
+
+.caption {
+  display: block;
+  line-height: 1.0em;
+  height: 2.2em;
+  overflow-y: hidden;
+  font-weight: bold;
+}
+
 /*
 .debug {
 display: none;
