@@ -1,4 +1,4 @@
-define(["jquery", "test-data", "handlebars"], function($, startGetData, handlebars) {
+define(["jquery", "test-data", "handlebars"], function($, data, handlebars) {
 
   function tabularPresenter() {
       var columns = 
@@ -108,7 +108,7 @@ define(["jquery", "test-data", "handlebars"], function($, startGetData, handleba
       //По идее на каждое изменение мы фильтры перечитываем, но если вдруг это изменится и вообще на всякий случай - перечитаем
       $('[data-filter-load]').toArray().map(_ => { var s = $(_); eval(s.attr('data-filter-load'))(s); });
 
-      startGetData(pageNum, pageSize, filters)
+      data.startGetPage(pageNum, pageSize, filters)
           .then(
               (result) => {
                 var pgcount = Math.ceil(result.total / pageSize);
@@ -162,8 +162,8 @@ define(["jquery", "test-data", "handlebars"], function($, startGetData, handleba
       ul.find('.page-link.page-prev').click(eventObject => startSetPage(page - 1));
   }
 
-  //Class filter
-  function onClassFilterChange( event ) {
+  //Generic checklist filter
+  function handleChecklistFilterChange( event ) {
     var filterRoot = $(event.target).parents('[data-filter-load]');
     var menu = filterRoot.find('.dropdown-menu');
     if (event.currentTarget == event.target) {//direct click on a link text
@@ -179,21 +179,37 @@ define(["jquery", "test-data", "handlebars"], function($, startGetData, handleba
     return true;
   }
 
-  function loadClassFilter(filterRootSelector) {
+  function readChecklistFilter(filterRootSelector) {
     var menu = filterRootSelector.find('.dropdown-menu');
     if (menu.find('input:not(:checked)').length == 0) {
-      delete filters.classes;
+      return null;
     } else {
-      filters.classes = menu.find('input:checked').parent().toArray().map($).map(_ => _.attr("data-value")).map(Number);
+      return menu.find('input:checked').parent().toArray().map($).map(_ => _.attr("data-value"));
     }
   }
 
-  function clearClassFilter(filterRootSelector) {
+  function clearChecklistFilter(filterRootSelector) {
       filterRootSelector.find('.dropdown-menu a').find('input').prop('checked', true);
   }
 
+  //Class filter
+  function loadClassFilter(filterRootSelector) {
+    var selection = readChecklistFilter(filterRootSelector);
+    if (selection) {filters.classes = selection.map(Number)} else {delete filters.classes};
+  }
+
   function bindClassFilter(filterRootSelector) {
-      filterRootSelector.find('.dropdown-menu a').on('click', onClassFilterChange);
+      filterRootSelector.find('.dropdown-menu a').on('click', event => handleChecklistFilterChange(event, loadClassFilter));
+  }
+
+  //Brand filter
+  function loadBrandFilter(filterRootSelector) {
+    var selection = readChecklistFilter(filterRootSelector);
+    if (selection) {filters.brands = selection} else {delete filters.brands};
+  }
+
+  function bindBrandFilter(filterRootSelector) {
+      filterRootSelector.find('.dropdown-menu a').on('click', event => handleChecklistFilterChange(event, loadBrandFilter));
   }
 
   var page;

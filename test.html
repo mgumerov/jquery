@@ -5,15 +5,28 @@
 </head>
 <body>
 
-<div class="dropdown" data-filter-bind="bindClassFilter" data-filter-load="loadClassFilter" data-filter-clear="clearClassFilter">
-  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">Класс нагрузки<span class="caret"></span></button>
-  <ul class="dropdown-menu">
-    <li><a href="#" class="small" tabIndex="-1">Любой</li>
-    <li><a href="#" class="small" data-value="31" tabIndex="-1"><input type="checkbox"/>&nbsp;31</a></li>
-    <li><a href="#" class="small" data-value="32" tabIndex="-1"><input type="checkbox"/>&nbsp;32</a></li>
-    <li><a href="#" class="small" data-value="33" tabIndex="-1"><input type="checkbox"/>&nbsp;33</a></li>
-    <li><a href="#" class="small" data-value="34" tabIndex="-1"><input type="checkbox"/>&nbsp;34</a></li>
-  </ul>
+<div class="form-inline">
+  <div class="form-group">
+  Фильтры:
+  </div>
+  <div class="form-group dropdown " data-filter-bind="bindClassFilter" data-filter-load="loadClassFilter" data-filter-clear="clearChecklistFilter">
+    <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">Класс нагрузки<span class="caret"></span></button>
+    <ul class="dropdown-menu">
+      <li><a href="#" class="small" tabIndex="-1">Любой</li>
+      <li><a href="#" class="small" data-value="31" tabIndex="-1"><input type="checkbox"/>&nbsp;31</a></li>
+      <li><a href="#" class="small" data-value="32" tabIndex="-1"><input type="checkbox"/>&nbsp;32</a></li>
+      <li><a href="#" class="small" data-value="33" tabIndex="-1"><input type="checkbox"/>&nbsp;33</a></li>
+      <li><a href="#" class="small" data-value="34" tabIndex="-1"><input type="checkbox"/>&nbsp;34</a></li>
+    </ul>
+  </div>
+  <div class="form-group dropdown " data-filter-bind="bindBrandFilter" data-filter-load="loadBrandFilter" data-filter-clear="clearChecklistFilter">
+    <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">Бренд<span class="caret"></span></button>
+    <ul class="dropdown-menu">
+      <li><a href="#" class="small" tabIndex="-1">Любой</li>
+      <li><a href="#" class="small" data-value="Balterio" tabIndex="-1"><input type="checkbox"/>&nbsp;Balterio</a></li>
+      <li><a href="#" class="small" data-value="Maestro" tabIndex="-1"><input type="checkbox"/>&nbsp;Maestro</a></li>
+    </ul>
+  </div>
 </div>
 
 <p class="debug" id="urldebug"></p>
