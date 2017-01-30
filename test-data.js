@@ -18,6 +18,9 @@ define(["jquery"], function($) {
                      if (filters && filters.classes) {
                        filtered = filtered.filter(_ => filters.classes.includes(_['Класс нагрузки']));
                      }
+                     if (filters && filters.brands) {
+                       filtered = filtered.filter(_ => filters.brands.includes(_['Бренд']));
+                     }
                      //In fact, returns empty array if requested a page beyond all available items
                      return {
                        total: filtered.length,
@@ -28,7 +31,7 @@ define(["jquery"], function($) {
       };
 
   result.startGetBrands =
-      //returns a promise which resolves to string[] on success and status-text on failure
+      //returns a promise which resolves to Set<string> on success and status-text on failure
       function () {
           return $.ajax({
             dataType : "json",
@@ -37,7 +40,7 @@ define(["jquery"], function($) {
           })
           .promise()
           .then( function done(result, textStatus) {
-                     return result;
+                     return new Set(result.page.map(_ => _["Бренд"]));
                  },
                  function failed(xhr, text) { return $.Deferred().reject(text); } );
       };

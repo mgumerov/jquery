@@ -1,3 +1,5 @@
+//TODO Websockets использовать чтоб подписаться на изменения например списка брендов? Не так чтоб это прямо было обязательно,
+//  но это эффективнее, чем при каждом запросе поллить или с каким-то периодом
 define(["jquery", "test-data", "handlebars"], function($, data, handlebars) {
 
   function tabularPresenter() {
@@ -107,7 +109,6 @@ define(["jquery", "test-data", "handlebars"], function($, data, handlebars) {
 
       //По идее на каждое изменение мы фильтры перечитываем, но если вдруг это изменится и вообще на всякий случай - перечитаем
       $('[data-filter-load]').toArray().map(_ => { var s = $(_); eval(s.attr('data-filter-load'))(s); });
-
       data.startGetPage(pageNum, pageSize, filters)
           .then(
               (result) => {
@@ -209,7 +210,21 @@ define(["jquery", "test-data", "handlebars"], function($, data, handlebars) {
   }
 
   function bindBrandFilter(filterRootSelector) {
-      filterRootSelector.find('.dropdown-menu a').on('click', event => handleChecklistFilterChange(event, loadBrandFilter));
+      filterRootSelector.find('.dropdown-toggle').prop('disabled', true);
+
+      //сразу при показе; но также, по идее, при любом опросе страницы. Опять не знаю, как "правильно".
+      //Плюс если перестроили фильтр, надо и прежний в нем выбор запоминать и восстанавливать. Но пока не перестраиваем.
+      data.startGetBrands().then(function success(set) {
+          set.forEach(_ => {
+                  var li = $('<li>').appendTo(filterRootSelector.find('ul'));
+                  var a = $('<a href="#" class="small" tabIndex="-1">').attr("data-value", _).appendTo(li);
+                  $('<input type="checkbox"/>').appendTo(a);
+                  a.append('\xa0' + _);
+          });
+          filterRootSelector.find('.dropdown-menu a').on('click', event => handleChecklistFilterChange(event, loadBrandFilter));
+          clearChecklistFilter(filterRootSelector);
+          filterRootSelector.find('.dropdown-toggle').prop('disabled', false);
+      });
   }
 
   var page;
